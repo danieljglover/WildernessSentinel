@@ -1,13 +1,13 @@
-package com.WildernessPlayerAlarm;
+package com.WildernessSentinel;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
-public class WildernessPlayerAlarmTest
+public class WildernessSentinelTest
 {
 	public static void main(String[] args) throws Exception
 	{
-		ExternalPluginManager.loadBuiltin(WildernessPlayerAlarmPlugin.class);
+		ExternalPluginManager.loadBuiltin(WildernessSentinelPlugin.class);
 		RuneLite.main(args);
 	}
 }

@@ -1,4 +1,4 @@
-package com.WildernessPlayerAlarm;
+package com.WildernessSentinel;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.WildernessPlayerAlarm;
+package com.WildernessSentinel;
 
 import java.awt.*;
 import javax.inject.Inject;
@@ -6,12 +6,12 @@ import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.OverlayPanel;
 
 public class AlarmOverlay extends OverlayPanel {
-  private final WildernessPlayerAlarmConfig config;
+  private final WildernessSentinelConfig config;
   private final Client client;
   private final Color transparent = new Color(0, 0, 0, 0);
 
   @Inject
-  private AlarmOverlay(WildernessPlayerAlarmConfig config, Client client) {
+  private AlarmOverlay(WildernessSentinelConfig config, Client client) {
     this.config = config;
     this.client = client;
     setPriority(PRIORITY_LOW);
