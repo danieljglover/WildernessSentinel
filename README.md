@@ -2,9 +2,6 @@
 
 A comprehensive Wilderness protection plugin for RuneLite that detects, tracks, and alerts you to PKer threats using a community-powered database.
 
-![Plugin Overview](screenshots/overview.png)
-*Screenshot: Plugin settings panel with all configurable options*
-
 ---
 
 ## Features
@@ -17,8 +14,7 @@ Automatically detects when another player enters your vicinity in the Wilderness
 - **Skulled player detection** — optionally alert for unknown skulled players who have initiated PvP combat
 - **PvP world support** — trigger alerts anywhere on PvP and Deadman Mode worlds
 
-![Screen Flash](screenshots/screen-flash.png)
-*Screenshot: Full-screen flash alarm when a player is detected*
+![Screen Alert](screenshots/Screen_Alert.png)
 
 ### Community PKer Database
 A shared, crowd-sourced database of known PKers. When a player attacks you, their name is automatically reported to the server. All plugin users benefit from each other's reports.
@@ -29,8 +25,7 @@ A shared, crowd-sourced database of known PKers. When a player attacks you, thei
 - **Real-time sync** — PKer list updates every 10 seconds from the server
 - **7-day expiry** — inactive PKers are automatically removed after 7 days without a sighting
 
-![Report PKer](screenshots/report-pker.png)
-*Screenshot: Right-click "Report PKer" menu option on a player*
+![Manual Report](screenshots/Manual_Report.png)
 
 ### Threat Tier System
 PKers are colour-coded by how many unique users have reported them, giving you an instant threat assessment.
@@ -40,9 +35,6 @@ PKers are colour-coded by how many unique users have reported them, giving you a
 - **High threat** (red) — reported by 10+ users
 - **Fully customisable** — adjust thresholds and colours for each tier
 
-![Threat Tiers](screenshots/threat-tiers.png)
-*Screenshot: Colour-coded PKer highlights showing different threat levels*
-
 ### In-Game PKer Highlights
 Known PKers are visually highlighted in the game world with a coloured hull outline and an info label showing their combat level, last seen world, and report count.
 
@@ -50,8 +42,7 @@ Known PKers are visually highlighted in the game world with a coloured hull outl
 - **Info label** — displays "PKer (Lv-126 | W319 | x5)" above their head
 - **Configurable** — toggle outline and label independently, adjust stroke width
 
-![PKer Highlight](screenshots/pker-highlight.png)
-*Screenshot: Known PKer highlighted with hull outline and info label*
+![In-Game Highlight](screenshots/In-Game_Highlight.png)
 
 ### Minimap Indicators
 Known PKers appear as coloured dots on the minimap, making it easy to track their position relative to you.
@@ -60,8 +51,7 @@ Known PKers appear as coloured dots on the minimap, making it easy to track thei
 - **Configurable dot size** (2–12 pixels)
 - **Toggle on/off independently**
 
-![Minimap Dots](screenshots/minimap-dots.png)
-*Screenshot: Coloured PKer dots on the minimap*
+![Minimap Highlight](screenshots/Minimap_Highlight.png)
 
 ### PKer Team Warning
 When multiple known PKers are detected nearby simultaneously, a prominent on-screen warning alerts you to a potential PKer team or clan.
@@ -69,8 +59,7 @@ When multiple known PKers are detected nearby simultaneously, a prominent on-scr
 - **Configurable threshold** — set the number of PKers needed to trigger (default: 2)
 - **Customisable appearance** — adjust warning text colour and font size
 
-![Team Warning](screenshots/team-warning.png)
-*Screenshot: "PKer TEAM (3)" warning displayed on screen*
+![PKer Team Warning](screenshots/Pker_Team.png)
 
 ### Separate Notifications
 Configure different notifications for general player sightings and known PKer detections — use distinct sounds, tray popups, or flash patterns to tell them apart instantly.
@@ -94,8 +83,7 @@ A dedicated RuneLite sidebar panel for browsing and searching the PKer database.
 - **Search** — filter the local list by typing, or press Enter to search the server
 - **Wilderness hotspots** — shows which wilderness level ranges have the most PKer activity
 
-![Sidebar Panel](screenshots/sidebar-panel.png)
-*Screenshot: PKer Database sidebar panel with search and hotspot data*
+![Sidebar Panel](screenshots/Sidebar_Panel.png)
 
 ### Last Seen Tracking
 The plugin tracks when and where known PKers were last seen active, keeping the database fresh and relevant.
