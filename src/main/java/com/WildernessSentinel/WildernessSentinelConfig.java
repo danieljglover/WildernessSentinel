@@ -127,6 +127,26 @@ public interface WildernessSentinelConfig extends Config {
     return "";
   }
 
+  @ConfigItem(
+      keyName = "onlyAlarmDangerousWeapons",
+      name = "Only dangerous weapons",
+      description = "Only alarm for players carrying known PK weapons (whip, claws, godswords, etc.).",
+      section = filtersSection,
+      position = 17)
+  default boolean onlyAlarmDangerousWeapons() {
+    return false;
+  }
+
+  @ConfigItem(
+      keyName = "customAlertItemIds",
+      name = "Custom alert item IDs",
+      description = "Comma-separated list of item IDs to also trigger the alarm on (weapons, armour, etc.). Look up IDs on the OSRS Wiki.",
+      section = filtersSection,
+      position = 18)
+  default String customAlertItemIds() {
+    return "";
+  }
+
   // -- Notifications --
 
   @ConfigItem(

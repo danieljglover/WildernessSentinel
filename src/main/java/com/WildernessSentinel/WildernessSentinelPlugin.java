@@ -13,6 +13,8 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.Constants;
+import net.runelite.api.ItemID;
+import net.runelite.api.kit.KitType;
 import net.runelite.api.Player;
 import net.runelite.api.Varbits;
 import net.runelite.api.WorldType;
@@ -54,6 +56,70 @@ public class WildernessSentinelPlugin extends Plugin {
   private final HashMap<String, Integer> playerNameToTimeInRange = new HashMap<>();
 
   private final SafeZoneHelper zoneHelper = new SafeZoneHelper();
+
+  private final Set<Integer> customAlertItemIds = new HashSet<>();
+
+  private static final Set<Integer> DANGEROUS_WEAPON_IDS = Set.of(
+      // Melee - Whips
+      ItemID.ABYSSAL_WHIP, ItemID.ABYSSAL_WHIP_4178, ItemID.VOLCANIC_ABYSSAL_WHIP,
+      ItemID.FROZEN_ABYSSAL_WHIP, ItemID.ABYSSAL_WHIP_OR, ItemID.ABYSSAL_WHIP_20405,
+      // Melee - Dragon claws
+      ItemID.DRAGON_CLAWS, ItemID.DRAGON_CLAWS_OR, ItemID.DRAGON_CLAWS_CR,
+      ItemID.DRAGON_CLAWS_20784, ItemID.CORRUPTED_DRAGON_CLAWS,
+      // Melee - Granite maul
+      ItemID.GRANITE_MAUL, ItemID.GRANITE_MAUL_12848, ItemID.GRANITE_MAUL_20557,
+      ItemID.GRANITE_MAUL_24225, ItemID.GRANITE_MAUL_24227,
+      // Melee - Elder maul
+      ItemID.ELDER_MAUL, ItemID.ELDER_MAUL_21205, ItemID.ELDER_MAUL_OR,
+      // Melee - Godswords
+      ItemID.ARMADYL_GODSWORD, ItemID.ARMADYL_GODSWORD_OR, ItemID.ARMADYL_GODSWORD_20593,
+      ItemID.ARMADYL_GODSWORD_22665, ItemID.CORRUPTED_ARMADYL_GODSWORD,
+      ItemID.ARMADYL_GODSWORD_DEADMAN,
+      ItemID.BANDOS_GODSWORD, ItemID.BANDOS_GODSWORD_OR, ItemID.BANDOS_GODSWORD_20782,
+      ItemID.BANDOS_GODSWORD_21060,
+      ItemID.SARADOMIN_GODSWORD, ItemID.SARADOMIN_GODSWORD_OR,
+      ItemID.ZAMORAK_GODSWORD, ItemID.ZAMORAK_GODSWORD_OR,
+      ItemID.ANCIENT_GODSWORD, ItemID.ANCIENT_GODSWORD_27184,
+      // Melee - Rapier
+      ItemID.GHRAZI_RAPIER, ItemID.GHRAZI_RAPIER_23628, ItemID.HOLY_GHRAZI_RAPIER,
+      // Melee - Dragon dagger
+      ItemID.DRAGON_DAGGER, ItemID.DRAGON_DAGGERP, ItemID.DRAGON_DAGGERP_5680,
+      ItemID.DRAGON_DAGGERP_5698, ItemID.DRAGON_DAGGER_20407,
+      ItemID.DRAGON_DAGGER_CR, ItemID.DRAGON_DAGGER_PCR,
+      ItemID.DRAGON_DAGGER_PCR_28023, ItemID.DRAGON_DAGGER_PCR_28025,
+      // Melee - Dragon scimitar
+      ItemID.DRAGON_SCIMITAR, ItemID.DRAGON_SCIMITAR_OR, ItemID.DRAGON_SCIMITAR_20406,
+      ItemID.DRAGON_SCIMITAR_CR,
+      // Melee - Other
+      ItemID.VOIDWAKER, ItemID.VOIDWAKER_27869, ItemID.CORRUPTED_VOIDWAKER,
+      ItemID.VOIDWAKER_DEADMAN,
+      ItemID.VESTAS_LONGSWORD, ItemID.VESTAS_LONGSWORD_23615, ItemID.VESTAS_LONGSWORD_BH,
+      ItemID.STATIUSS_WARHAMMER, ItemID.STATIUSS_WARHAMMER_23620, ItemID.STATIUSS_WARHAMMER_BH,
+      ItemID.INQUISITORS_MACE, ItemID.INQUISITORS_MACE_27198,
+      ItemID.URSINE_CHAINMACE,
+      // Ranged
+      ItemID.TOXIC_BLOWPIPE, ItemID.TOXIC_BLOWPIPE_EMPTY,
+      ItemID.ARMADYL_CROSSBOW, ItemID.ARMADYL_CROSSBOW_23611,
+      ItemID.DRAGON_CROSSBOW, ItemID.DRAGON_CROSSBOW_CR,
+      ItemID.ZARYTE_CROSSBOW, ItemID.ZARYTE_CROSSBOW_27186,
+      ItemID.HEAVY_BALLISTA, ItemID.HEAVY_BALLISTA_23630, ItemID.HEAVY_BALLISTA_OR,
+      ItemID.MAGIC_SHORTBOW_I,
+      ItemID.DARK_BOW, ItemID.DARK_BOW_12765, ItemID.DARK_BOW_12766,
+      ItemID.DARK_BOW_12767, ItemID.DARK_BOW_12768, ItemID.DARK_BOW_20408,
+      ItemID.DARK_BOW_BH, ItemID.CORRUPTED_DARK_BOW, ItemID.DARK_BOW_DEADMAN,
+      // Magic
+      ItemID.TOXIC_STAFF_OF_THE_DEAD, ItemID.TOXIC_STAFF_UNCHARGED,
+      ItemID.TOXIC_STAFF_DEADMAN,
+      ItemID.NIGHTMARE_STAFF, ItemID.VOLATILE_NIGHTMARE_STAFF,
+      ItemID.ELDRITCH_NIGHTMARE_STAFF, ItemID.HARMONISED_NIGHTMARE_STAFF,
+      ItemID.VOLATILE_NIGHTMARE_STAFF_25517, ItemID.CORRUPTED_VOLATILE_NIGHTMARE_STAFF,
+      ItemID.VOLATILE_NIGHTMARE_STAFF_DEADMAN,
+      ItemID.KODAI_WAND, ItemID.KODAI_WAND_23626,
+      ItemID.TUMEKENS_SHADOW, ItemID.TUMEKENS_SHADOW_UNCHARGED,
+      ItemID.CORRUPTED_TUMEKENS_SHADOW, ItemID.CORRUPTED_TUMEKENS_SHADOW_UNCHARGED,
+      ItemID.SANGUINESTI_STAFF, ItemID.SANGUINESTI_STAFF_UNCHARGED,
+      ItemID.HOLY_SANGUINESTI_STAFF, ItemID.HOLY_SANGUINESTI_STAFF_UNCHARGED
+  );
 
   @Subscribe
   public void onPlayerDespawned(PlayerDespawned event) {
@@ -145,7 +211,43 @@ public class WildernessSentinelPlugin extends Plugin {
       }
     }
 
+    if (config.onlyAlarmDangerousWeapons() && !hasDangerousEquipment(player)) {
+      return false;
+    }
+
     return true;
+  }
+
+  private boolean hasDangerousEquipment(Player player) {
+    if (player.getPlayerComposition() == null) {
+      return false;
+    }
+    int weaponId = player.getPlayerComposition().getEquipmentId(KitType.WEAPON);
+    if (DANGEROUS_WEAPON_IDS.contains(weaponId)) {
+      return true;
+    }
+    if (!customAlertItemIds.isEmpty()) {
+      for (KitType slot : KitType.values()) {
+        int itemId = player.getPlayerComposition().getEquipmentId(slot);
+        if (customAlertItemIds.contains(itemId)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private void resetCustomAlertItemIds() {
+    customAlertItemIds.clear();
+    for (String s : config.customAlertItemIds().split(",")) {
+      String trimmed = s.trim();
+      if (!trimmed.isEmpty()) {
+        try {
+          customAlertItemIds.add(Integer.parseInt(trimmed));
+        } catch (NumberFormatException ignored) {
+        }
+      }
+    }
   }
 
   private void updatePlayersInRange() {
@@ -210,6 +312,7 @@ public class WildernessSentinelPlugin extends Plugin {
   protected void startUp() {
     overlay.setLayer(config.flashLayer().getLayer());
     resetCustomIgnores();
+    resetCustomAlertItemIds();
   }
 
   @Override
@@ -232,6 +335,7 @@ public class WildernessSentinelPlugin extends Plugin {
         addOverlay();
       }
       resetCustomIgnores();
+      resetCustomAlertItemIds();
     }
   }
 
