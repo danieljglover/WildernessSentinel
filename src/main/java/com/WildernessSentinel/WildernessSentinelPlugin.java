@@ -427,7 +427,7 @@ public class WildernessSentinelPlugin extends Plugin {
       return;
     }
 
-    MenuEntry entry = client.createMenuEntry(-1)
+    client.createMenuEntry(1)
         .setOption(IGNORE_OPTION)
         .setTarget(event.getTarget())
         .setType(MenuAction.RUNELITE)
