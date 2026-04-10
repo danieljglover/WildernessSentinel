@@ -23,16 +23,17 @@ import net.runelite.api.Player;
 import net.runelite.api.Varbits;
 import net.runelite.api.WorldType;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.MenuAction;
+import net.runelite.api.MenuEntry;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.api.events.PlayerDespawned;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
-import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
-import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -50,7 +51,6 @@ public class WildernessSentinelPlugin extends Plugin {
   @Inject private AlarmOverlay overlay;
 
   @Inject private Notifier notifier;
-  @Inject private MenuManager menuManager;
   @Inject private ConfigManager configManager;
 
   private static final String IGNORE_OPTION = "Sentinel Ignore";
@@ -388,7 +388,6 @@ public class WildernessSentinelPlugin extends Plugin {
     overlayManager.add(escapeTileOverlay);
     overlayManager.add(escapeMinimapOverlay);
     overlayManager.add(teleportHighlightOverlay);
-    menuManager.addPlayerMenuItem(IGNORE_OPTION);
   }
 
   @Override
@@ -402,7 +401,6 @@ public class WildernessSentinelPlugin extends Plugin {
     overlayManager.remove(escapeTileOverlay);
     overlayManager.remove(escapeMinimapOverlay);
     overlayManager.remove(teleportHighlightOverlay);
-    menuManager.removePlayerMenuItem(IGNORE_OPTION);
   }
 
   @Subscribe
@@ -423,20 +421,26 @@ public class WildernessSentinelPlugin extends Plugin {
   }
 
   @Subscribe
-  public void onMenuOptionClicked(MenuOptionClicked event) {
-    if (!IGNORE_OPTION.equals(event.getMenuOption())) {
+  public void onMenuEntryAdded(MenuEntryAdded event) {
+    if (event.getType() != MenuAction.PLAYER_FIRST_OPTION.getId()
+        && event.getType() != MenuAction.PLAYER_SECOND_OPTION.getId()) {
       return;
     }
 
-    String target = Text.removeTags(event.getMenuTarget()).replaceAll("\\s*\\(.*\\)\\s*", "").trim();
-    if (target.isEmpty()) {
-      return;
-    }
-
-    String current = config.customIgnoresList();
-    String updated = current.isEmpty() ? target : current + "," + target;
-    configManager.setConfiguration("WildernessSentinel", "customIgnores", updated);
-    resetCustomIgnores();
+    MenuEntry entry = client.createMenuEntry(-1)
+        .setOption(IGNORE_OPTION)
+        .setTarget(event.getTarget())
+        .setType(MenuAction.RUNELITE)
+        .setDeprioritized(true)
+        .onClick(e -> {
+          String target = Text.removeTags(e.getTarget()).replaceAll("\\s*\\(.*\\)\\s*", "").trim();
+          if (!target.isEmpty()) {
+            String current = config.customIgnoresList();
+            String updated = current.isEmpty() ? target : current + "," + target;
+            configManager.setConfiguration("WildernessSentinel", "customIgnores", updated);
+            resetCustomIgnores();
+          }
+        });
   }
 
   @Provides

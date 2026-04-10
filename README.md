@@ -18,6 +18,8 @@ Stack multiple filters to narrow down exactly which players trigger the alarm:
 
 Enable all three together to only alert on skulled players within your combat range who are carrying PK weapons.
 
+![Threat Detection](screenshots/threat_detection.png)
+
 ### Escape Route System
 When you're under attack, the plugin calculates and displays your best escape option:
 
@@ -31,6 +33,10 @@ When you're under attack, the plugin calculates and displays your best escape op
 - **Game world path** - green highlighted tiles with connecting lines showing the walkable escape route
 - **Minimap path** - matching green line on the minimap for at-a-glance direction
 
+![Escape Route](screenshots/escape_route.png)
+
+![Teleport Highlight](screenshots/teleport_highlight.png)
+
 ### Player Highlights
 Visual indicators on players who pass all your filters:
 
@@ -38,6 +44,8 @@ Visual indicators on players who pass all your filters:
 - **Overhead label** - shows combat level and skull status
 - **Minimap dots** - coloured dots for threats on the minimap
 - **Configurable** - colour, outline thickness, and dot size
+
+![Player Highlights](screenshots/player_highlights.png)
 
 ### Smart Ignore List
 Exclude players you trust:
@@ -48,6 +56,8 @@ Exclude players you trust:
 - Custom ignore list with specific player names
 - Player timeout - stop alerting after a player has been nearby for a set duration
 - Ferox Enclave safe zone detection
+
+![Sentinel Ignore](screenshots/sentinel_ignore.png)
 
 ### Screen Flash
 Full-screen flash overlay when a threat is detected:
@@ -77,3 +87,5 @@ RuneLite notification when a threat is detected - configure sound, tray popup, a
 | **Escape Route** | Show escape route, always show in wilderness, show minimap line |
 | **Notifications** | Player spotted notification |
 | **Screen Flash** | Flash colour, speed, render layer |
+
+![Config Panel](screenshots/config_panel.png)
