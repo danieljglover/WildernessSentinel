@@ -29,11 +29,14 @@ import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.Notifier;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.menus.MenuManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.util.Text;
 
 @Slf4j
 @PluginDescriptor(name = "Wilderness Sentinel")
@@ -47,6 +50,10 @@ public class WildernessSentinelPlugin extends Plugin {
   @Inject private AlarmOverlay overlay;
 
   @Inject private Notifier notifier;
+  @Inject private MenuManager menuManager;
+  @Inject private ConfigManager configManager;
+
+  private static final String IGNORE_OPTION = "Sentinel Ignore";
 
   @Inject private ThreatHighlightOverlay threatHighlightOverlay;
   @Inject private ThreatMinimapOverlay threatMinimapOverlay;
@@ -381,6 +388,7 @@ public class WildernessSentinelPlugin extends Plugin {
     overlayManager.add(escapeTileOverlay);
     overlayManager.add(escapeMinimapOverlay);
     overlayManager.add(teleportHighlightOverlay);
+    menuManager.addPlayerMenuItem(IGNORE_OPTION);
   }
 
   @Override
@@ -394,6 +402,7 @@ public class WildernessSentinelPlugin extends Plugin {
     overlayManager.remove(escapeTileOverlay);
     overlayManager.remove(escapeMinimapOverlay);
     overlayManager.remove(teleportHighlightOverlay);
+    menuManager.removePlayerMenuItem(IGNORE_OPTION);
   }
 
   @Subscribe
@@ -411,6 +420,23 @@ public class WildernessSentinelPlugin extends Plugin {
       resetCustomIgnores();
       resetCustomAlertItemIds();
     }
+  }
+
+  @Subscribe
+  public void onMenuOptionClicked(MenuOptionClicked event) {
+    if (!IGNORE_OPTION.equals(event.getMenuOption())) {
+      return;
+    }
+
+    String target = Text.removeTags(event.getMenuTarget()).replaceAll("\\s*\\(.*\\)\\s*", "").trim();
+    if (target.isEmpty()) {
+      return;
+    }
+
+    String current = config.customIgnoresList();
+    String updated = current.isEmpty() ? target : current + "," + target;
+    configManager.setConfiguration("WildernessSentinel", "customIgnores", updated);
+    resetCustomIgnores();
   }
 
   @Provides

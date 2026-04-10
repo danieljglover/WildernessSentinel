@@ -42,6 +42,7 @@ Visual indicators on players who pass all your filters:
 ### Smart Ignore List
 Exclude players you trust:
 
+- **Right-click "Sentinel Ignore"** - right-click any player to add them to your ignore list instantly
 - Friends, clan members, and friends chat
 - Blocked players from your in-game ignore list
 - Custom ignore list with specific player names
