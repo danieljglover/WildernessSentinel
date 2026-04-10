@@ -15,21 +15,33 @@ public interface WildernessSentinelConfig extends Config {
   String generalSection = "generalSection";
 
   @ConfigSection(
-      name = "Alarm Filters",
-      description = "Control which players trigger the alarm",
+      name = "Threat Detection",
+      description = "Stack filters to reduce false alerts",
       position = 10)
-  String filtersSection = "filtersSection";
+  String threatSection = "threatSection";
+
+  @ConfigSection(
+      name = "Ignore List",
+      description = "Players to exclude from alerts",
+      position = 20)
+  String ignoreSection = "ignoreSection";
+
+  @ConfigSection(
+      name = "Player Highlights",
+      description = "Visual indicators on filtered threats",
+      position = 30)
+  String highlightSection = "highlightSection";
 
   @ConfigSection(
       name = "Notifications",
       description = "Sound and system notifications",
-      position = 20)
+      position = 40)
   String notificationsSection = "notificationsSection";
 
   @ConfigSection(
       name = "Screen Flash",
-      description = "Full-screen flash overlay settings",
-      position = 30)
+      description = "Full-screen flash overlay",
+      position = 50)
   String flashSection = "flashSection";
 
   // -- General --
@@ -38,7 +50,7 @@ public interface WildernessSentinelConfig extends Config {
   @ConfigItem(
       keyName = "alarmRadius",
       name = "Alarm radius (tiles)",
-      description = "Distance in tiles for a player to trigger the alarm. Players beyond render distance will not be detected.",
+      description = "Detection range in tiles",
       section = generalSection,
       position = 1)
   default int alarmRadius() {
@@ -48,7 +60,7 @@ public interface WildernessSentinelConfig extends Config {
   @ConfigItem(
       keyName = "timeoutToIgnore",
       name = "Player timeout (seconds)",
-      description = "Stop alarming for a player after they have been nearby for this many seconds. 0 to disable.",
+      description = "Ignore a player after this many seconds nearby. 0 to disable.",
       section = generalSection,
       position = 2)
   default int timeoutToIgnore() {
@@ -58,81 +70,41 @@ public interface WildernessSentinelConfig extends Config {
   @ConfigItem(
       keyName = "pvpWorldAlerts",
       name = "PvP world alerts",
-      description = "Trigger alerts everywhere when on a PvP or Deadman Mode world, not just in the Wilderness.",
+      description = "Alert everywhere on PvP/Deadman worlds",
       section = generalSection,
       position = 3)
   default boolean pvpWorldAlerts() {
     return false;
   }
 
-  // -- Alarm Filters --
+  // -- Threat Detection --
 
   @ConfigItem(
       keyName = "onlyAlarmAttackable",
       name = "Only attackable players",
-      description = "Only alarm for players within your attackable combat level range based on the current wilderness level. Has no effect in PvP worlds.",
-      section = filtersSection,
+      description = "Only players within your combat range for the current wilderness level",
+      section = threatSection,
       position = 11)
   default boolean onlyAlarmAttackable() {
     return false;
   }
 
   @ConfigItem(
-      keyName = "ignoreFriends",
-      name = "Ignore friends",
-      description = "Do not alarm for players on your friends list.",
-      section = filtersSection,
+      keyName = "onlyAlarmSkulled",
+      name = "Only skulled players",
+      description = "Only players with a skull overhead",
+      section = threatSection,
       position = 12)
-  default boolean ignoreFriends() {
-    return true;
-  }
-
-  @ConfigItem(
-      keyName = "ignoreClan",
-      name = "Ignore clan members",
-      description = "Do not alarm for players in your clan.",
-      section = filtersSection,
-      position = 13)
-  default boolean ignoreClan() {
-    return true;
-  }
-
-  @ConfigItem(
-      keyName = "ignoreFriendsChat",
-      name = "Ignore friends chat",
-      description = "Do not alarm for players in the same friends chat.",
-      section = filtersSection,
-      position = 14)
-  default boolean ignoreFriendsChat() {
+  default boolean onlyAlarmSkulled() {
     return false;
-  }
-
-  @ConfigItem(
-      keyName = "ignoreIgnored",
-      name = "Ignore blocked players",
-      description = "Do not alarm for players on your in-game ignore list.",
-      section = filtersSection,
-      position = 15)
-  default boolean ignoreIgnored() {
-    return false;
-  }
-
-  @ConfigItem(
-      keyName = "customIgnores",
-      name = "Custom ignore list",
-      description = "Comma-separated list of player names that should never trigger the alarm (case-insensitive).",
-      section = filtersSection,
-      position = 16)
-  default String customIgnoresList() {
-    return "";
   }
 
   @ConfigItem(
       keyName = "onlyAlarmDangerousWeapons",
       name = "Only dangerous weapons",
-      description = "Only alarm for players carrying known PK weapons (whip, claws, godswords, etc.).",
-      section = filtersSection,
-      position = 17)
+      description = "Only players carrying known PK weapons",
+      section = threatSection,
+      position = 13)
   default boolean onlyAlarmDangerousWeapons() {
     return false;
   }
@@ -140,11 +112,128 @@ public interface WildernessSentinelConfig extends Config {
   @ConfigItem(
       keyName = "customAlertItemIds",
       name = "Custom alert item IDs",
-      description = "Comma-separated list of item IDs to also trigger the alarm on (weapons, armour, etc.). Look up IDs on the OSRS Wiki.",
-      section = filtersSection,
-      position = 18)
+      description = "Additional item IDs to treat as dangerous (comma-separated)",
+      section = threatSection,
+      position = 14)
   default String customAlertItemIds() {
     return "";
+  }
+
+  // -- Ignore List --
+
+  @ConfigItem(
+      keyName = "ignoreFriends",
+      name = "Ignore friends",
+      description = "Never alarm for friends",
+      section = ignoreSection,
+      position = 21)
+  default boolean ignoreFriends() {
+    return true;
+  }
+
+  @ConfigItem(
+      keyName = "ignoreClan",
+      name = "Ignore clan members",
+      description = "Never alarm for clan members",
+      section = ignoreSection,
+      position = 22)
+  default boolean ignoreClan() {
+    return true;
+  }
+
+  @ConfigItem(
+      keyName = "ignoreFriendsChat",
+      name = "Ignore friends chat",
+      description = "Never alarm for friends chat members",
+      section = ignoreSection,
+      position = 23)
+  default boolean ignoreFriendsChat() {
+    return false;
+  }
+
+  @ConfigItem(
+      keyName = "ignoreIgnored",
+      name = "Ignore blocked players",
+      description = "Never alarm for players on your ignore list",
+      section = ignoreSection,
+      position = 24)
+  default boolean ignoreIgnored() {
+    return false;
+  }
+
+  @ConfigItem(
+      keyName = "customIgnores",
+      name = "Custom ignore list",
+      description = "Player names to ignore (comma-separated, case-insensitive)",
+      section = ignoreSection,
+      position = 25)
+  default String customIgnoresList() {
+    return "";
+  }
+
+  // -- Player Highlights --
+
+  @ConfigItem(
+      keyName = "highlightThreats",
+      name = "Highlight in game world",
+      description = "Outline threatening players in the 3D world",
+      section = highlightSection,
+      position = 31)
+  default boolean highlightThreats() {
+    return false;
+  }
+
+  @Alpha
+  @ConfigItem(
+      keyName = "highlightColor",
+      name = "Highlight colour",
+      description = "Colour for outlines and minimap dots",
+      section = highlightSection,
+      position = 32)
+  default Color highlightColor() {
+    return new Color(255, 0, 0, 128);
+  }
+
+  @Range(min = 1, max = 5)
+  @ConfigItem(
+      keyName = "highlightStroke",
+      name = "Outline thickness",
+      description = "Stroke width in pixels",
+      section = highlightSection,
+      position = 33)
+  default int highlightStroke() {
+    return 2;
+  }
+
+  @ConfigItem(
+      keyName = "highlightLabel",
+      name = "Show overhead label",
+      description = "Show combat level and skull status above the player",
+      section = highlightSection,
+      position = 34)
+  default boolean highlightLabel() {
+    return true;
+  }
+
+  @ConfigItem(
+      keyName = "highlightMinimap",
+      name = "Highlight on minimap",
+      description = "Show coloured dots on the minimap for threats",
+      section = highlightSection,
+      position = 35)
+  default boolean highlightMinimap() {
+    return false;
+  }
+
+  @Range(min = 2, max = 12)
+  @ConfigItem(
+      keyName = "minimapDotSize",
+      name = "Minimap dot size",
+      description = "Dot diameter in pixels",
+      section = highlightSection,
+      position = 36)
+  default int minimapDotSize() {
+    return 6;
   }
 
   // -- Notifications --
@@ -152,9 +241,9 @@ public interface WildernessSentinelConfig extends Config {
   @ConfigItem(
       keyName = "customizableNotification",
       name = "Player spotted notification",
-      description = "Notification triggered when an alarming player is detected. Configure sound, tray popup, and flash independently.",
+      description = "Notification when a threat is detected",
       section = notificationsSection,
-      position = 21)
+      position = 41)
   default Notification customizableNotification() {
     return new Notification();
   }
@@ -165,9 +254,9 @@ public interface WildernessSentinelConfig extends Config {
   @ConfigItem(
       keyName = "flashColor",
       name = "Flash colour",
-      description = "Colour and transparency of the full-screen alarm flash.",
+      description = "Colour and transparency of the alarm flash",
       section = flashSection,
-      position = 31)
+      position = 51)
   default Color flashColor() {
     return new Color(255, 255, 0, 70);
   }
@@ -175,9 +264,9 @@ public interface WildernessSentinelConfig extends Config {
   @ConfigItem(
       keyName = "flashControl",
       name = "Flash speed",
-      description = "How fast the screen flashes when the alarm triggers.",
+      description = "How fast the screen flashes",
       section = flashSection,
-      position = 32)
+      position = 52)
   default FlashSpeed flashControl() {
     return FlashSpeed.NORMAL;
   }
@@ -185,9 +274,9 @@ public interface WildernessSentinelConfig extends Config {
   @ConfigItem(
       keyName = "flashLayer",
       name = "Flash render layer",
-      description = "Which rendering layer the flash overlay appears on. Change if the flash conflicts with other overlays.",
+      description = "Rendering layer for the flash overlay",
       section = flashSection,
-      position = 33)
+      position = 53)
   default FlashLayer flashLayer() {
     return FlashLayer.ABOVE_SCENE;
   }

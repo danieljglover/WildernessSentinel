@@ -10,10 +10,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.inject.Inject;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.List;
 import net.runelite.api.Client;
 import net.runelite.api.Constants;
 import net.runelite.api.ItemID;
+import net.runelite.api.SkullIcon;
 import net.runelite.api.kit.KitType;
 import net.runelite.api.Player;
 import net.runelite.api.Varbits;
@@ -43,6 +47,12 @@ public class WildernessSentinelPlugin extends Plugin {
   @Inject private AlarmOverlay overlay;
 
   @Inject private Notifier notifier;
+
+  @Inject private ThreatHighlightOverlay threatHighlightOverlay;
+  @Inject private ThreatMinimapOverlay threatMinimapOverlay;
+
+  @Getter
+  private final List<Player> threateningPlayers = new ArrayList<>();
 
   private boolean overlayOn = false;
 
@@ -134,12 +144,19 @@ public class WildernessSentinelPlugin extends Plugin {
       if (overlayOn) {
         removeOverlay();
       }
+      threateningPlayers.clear();
       return;
     }
 
     int wildernessLevel = isInWilderness ? getWildernessLevel() : -1;
-    boolean shouldAlarm =
-        getPlayersInRange().anyMatch(player -> shouldPlayerTriggerAlarm(player, isInWilderness, wildernessLevel));
+    threateningPlayers.clear();
+    boolean shouldAlarm = false;
+    for (Player player : getPlayersInRange().collect(java.util.stream.Collectors.toList())) {
+      if (shouldPlayerTriggerAlarm(player, isInWilderness, wildernessLevel)) {
+        shouldAlarm = true;
+        threateningPlayers.add(player);
+      }
+    }
 
     // Keep track of how long players have been in range if timeout is enabled
     if (config.timeoutToIgnore() > 0) {
@@ -209,6 +226,10 @@ public class WildernessSentinelPlugin extends Plugin {
       if (theirCombat < myCombat - wildernessLevel || theirCombat > myCombat + wildernessLevel) {
         return false;
       }
+    }
+
+    if (config.onlyAlarmSkulled() && player.getSkullIcon() == SkullIcon.NONE) {
+      return false;
     }
 
     if (config.onlyAlarmDangerousWeapons() && !hasDangerousEquipment(player)) {
@@ -313,6 +334,8 @@ public class WildernessSentinelPlugin extends Plugin {
     overlay.setLayer(config.flashLayer().getLayer());
     resetCustomIgnores();
     resetCustomAlertItemIds();
+    overlayManager.add(threatHighlightOverlay);
+    overlayManager.add(threatMinimapOverlay);
   }
 
   @Override
@@ -320,6 +343,9 @@ public class WildernessSentinelPlugin extends Plugin {
     if (overlayOn) {
       removeOverlay();
     }
+    threateningPlayers.clear();
+    overlayManager.remove(threatHighlightOverlay);
+    overlayManager.remove(threatMinimapOverlay);
   }
 
   @Subscribe

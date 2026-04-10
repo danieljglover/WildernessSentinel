@@ -1,56 +1,64 @@
 # Wilderness Sentinel
 
-A Wilderness protection plugin for RuneLite that alerts you when another player enters your vicinity while in the Wilderness or on PvP worlds.
+A Wilderness protection plugin for RuneLite that alerts you when threatening players are nearby, with configurable filters to reduce false alerts.
+
+![Screen Alert](screenshots/Screen_Alert.png)
 
 ---
 
 ## Features
 
-### Player Detection & Alerts
-Automatically detects when another player enters your vicinity in the Wilderness and triggers configurable alerts - screen flash and sound notifications.
+### Threat Detection
+Stack multiple filters to narrow down exactly which players trigger the alarm:
 
-- **Configurable alarm radius** (0-30 tiles)
-- **Combat level filtering** - only alert for players within your attackable combat range based on the current wilderness level
-- **PvP world support** - trigger alerts everywhere when on a PvP or Deadman Mode world
+- **Only attackable players** - filters by your combat level range for the current wilderness level
+- **Only skulled players** - only alert on players who have initiated PvP combat
+- **Only dangerous weapons** - only alert on players carrying known PK weapons (whips, claws, godswords, toxic staff, ballista, and 90+ more)
+- **Custom alert item IDs** - add your own item IDs to the dangerous equipment list
 
-![Screen Alert](screenshots/Screen_Alert.png)
+Enable all three together to only alert on skulled players within your combat range who are carrying PK weapons.
 
-### Smart Filtering
-Fine-grained control over which players trigger the alarm.
+### Player Highlights
+Visual indicators on players who pass all your filters:
 
-- **Friends, clan, and friends chat** - automatically ignored
-- **Blocked players** - optionally ignore your in-game block list
-- **Custom ignore list** - comma-separated player names to never alert on
-- **Player timeout** - stop alerting for a player after they have been nearby for a set duration
-- **Ferox Enclave safe zone** - players inside Ferox Enclave are automatically excluded
+- **In-game outline** - coloured hull outline around threatening players
+- **Overhead label** - shows combat level and skull status
+- **Minimap dots** - coloured dots for threats on the minimap
+- **Configurable** - colour, outline thickness, and dot size
 
-### Configurable Screen Flash
-Full-screen flash overlay with customisable appearance.
+### Smart Ignore List
+Exclude players you trust:
 
-- **Flash colour** - choose any colour with transparency control
-- **Flash speed** - off, slow, normal, fast, or solid
-- **Render layer** - control which layer the flash appears on
+- Friends, clan members, and friends chat
+- Blocked players from your in-game ignore list
+- Custom ignore list with specific player names
+- Player timeout - stop alerting after a player has been nearby for a set duration
+- Ferox Enclave safe zone detection
+
+### Screen Flash
+Full-screen flash overlay when a threat is detected:
+
+- Configurable colour with transparency
+- Multiple flash speeds (off, slow, normal, fast, solid)
+- Render layer control
 
 ### Notifications
-Configure RuneLite notifications with sound, tray popup, and flash options independently.
+RuneLite notification when a threat is detected - configure sound, tray popup, and flash independently.
+
+### Additional
+- **PvP world support** - alert everywhere on PvP and Deadman Mode worlds
+- **Combat level formula** - uses the correct Wilderness level +/- your combat level calculation
+- **Ferox Enclave** - automatically excludes players inside the safe zone
 
 ---
 
 ## Configuration
 
-All settings are organised into logical sections in the RuneLite plugin configuration panel:
-
 | Section | Options |
 |---------|---------|
 | **General** | Alarm radius, player timeout, PvP world alerts |
-| **Alarm Filters** | Combat level filter, friend/clan/chat ignores, custom ignore list |
+| **Threat Detection** | Attackable filter, skull filter, weapon filter, custom item IDs |
+| **Ignore List** | Friends, clan, friends chat, blocked, custom names |
+| **Player Highlights** | In-game outline, overhead label, minimap dots, colour, thickness, dot size |
 | **Notifications** | Player spotted notification |
 | **Screen Flash** | Flash colour, speed, render layer |
-
----
-
-## How It Works
-
-1. **Detection** - every game tick, the plugin scans for players within your alarm radius
-2. **Filtering** - each player is checked against your configured filters (friends, combat level, etc.)
-3. **Alerting** - if a player passes all filters, the alarm triggers with your configured notifications and flash overlay
