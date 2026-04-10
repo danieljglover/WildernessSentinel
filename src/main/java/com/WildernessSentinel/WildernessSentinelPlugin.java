@@ -50,6 +50,21 @@ public class WildernessSentinelPlugin extends Plugin {
 
   @Inject private ThreatHighlightOverlay threatHighlightOverlay;
   @Inject private ThreatMinimapOverlay threatMinimapOverlay;
+  @Inject private EscapeTileOverlay escapeTileOverlay;
+  @Inject private EscapeMinimapOverlay escapeMinimapOverlay;
+  @Inject private TeleportHighlightOverlay teleportHighlightOverlay;
+
+  @Getter
+  private final EscapeRouteManager escapeRouteManager = new EscapeRouteManager();
+
+  @Getter
+  private EscapeOption currentEscape;
+  @Getter
+  private net.runelite.api.coords.WorldPoint escapeDestination;
+  @Getter
+  private java.util.List<net.runelite.api.coords.WorldPoint> escapePath;
+  @Getter
+  private int currentWildernessLevel;
 
   @Getter
   private final List<Player> threateningPlayers = new ArrayList<>();
@@ -145,10 +160,14 @@ public class WildernessSentinelPlugin extends Plugin {
         removeOverlay();
       }
       threateningPlayers.clear();
+      currentEscape = null;
+      escapeDestination = null;
+      escapePath = null;
       return;
     }
 
     int wildernessLevel = isInWilderness ? getWildernessLevel() : -1;
+    currentWildernessLevel = wildernessLevel;
     threateningPlayers.clear();
     boolean shouldAlarm = false;
     for (Player player : getPlayersInRange().collect(java.util.stream.Collectors.toList())) {
@@ -172,6 +191,29 @@ public class WildernessSentinelPlugin extends Plugin {
 
     if (!shouldAlarm) {
       removeOverlay();
+    }
+
+    // Update escape route - only when being attacked
+    boolean beingAttacked = false;
+    for (Player player : client.getTopLevelWorldView().players()) {
+      if (player != null && player != client.getLocalPlayer()
+          && player.getInteracting() == client.getLocalPlayer()) {
+        beingAttacked = true;
+        break;
+      }
+    }
+    if (isInWilderness && (beingAttacked || config.alwaysShowEscape())) {
+      currentEscape = escapeRouteManager.getBestEscape(client, wildernessLevel);
+      escapeDestination = escapeRouteManager.getBestRunDestination(client);
+      if (currentEscape.getType() == EscapeOption.EscapeType.RUN) {
+        escapePath = escapeRouteManager.generateEscapePath(client);
+      } else {
+        escapePath = null;
+      }
+    } else {
+      currentEscape = null;
+      escapeDestination = null;
+      escapePath = null;
     }
   }
 
@@ -336,6 +378,9 @@ public class WildernessSentinelPlugin extends Plugin {
     resetCustomAlertItemIds();
     overlayManager.add(threatHighlightOverlay);
     overlayManager.add(threatMinimapOverlay);
+    overlayManager.add(escapeTileOverlay);
+    overlayManager.add(escapeMinimapOverlay);
+    overlayManager.add(teleportHighlightOverlay);
   }
 
   @Override
@@ -346,6 +391,9 @@ public class WildernessSentinelPlugin extends Plugin {
     threateningPlayers.clear();
     overlayManager.remove(threatHighlightOverlay);
     overlayManager.remove(threatMinimapOverlay);
+    overlayManager.remove(escapeTileOverlay);
+    overlayManager.remove(escapeMinimapOverlay);
+    overlayManager.remove(teleportHighlightOverlay);
   }
 
   @Subscribe

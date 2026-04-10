@@ -33,15 +33,21 @@ public interface WildernessSentinelConfig extends Config {
   String highlightSection = "highlightSection";
 
   @ConfigSection(
+      name = "Escape Route",
+      description = "Best escape option based on inventory and wilderness level",
+      position = 40)
+  String escapeSection = "escapeSection";
+
+  @ConfigSection(
       name = "Notifications",
       description = "Sound and system notifications",
-      position = 40)
+      position = 50)
   String notificationsSection = "notificationsSection";
 
   @ConfigSection(
       name = "Screen Flash",
       description = "Full-screen flash overlay",
-      position = 50)
+      position = 60)
   String flashSection = "flashSection";
 
   // -- General --
@@ -236,6 +242,38 @@ public interface WildernessSentinelConfig extends Config {
     return 6;
   }
 
+  // -- Escape Route --
+
+  @ConfigItem(
+      keyName = "showEscapeRoute",
+      name = "Show escape route",
+      description = "Show best escape option when threats are nearby",
+      section = escapeSection,
+      position = 41)
+  default boolean showEscapeRoute() {
+    return true;
+  }
+
+  @ConfigItem(
+      keyName = "alwaysShowEscape",
+      name = "Always show in wilderness",
+      description = "Show escape route at all times in wilderness",
+      section = escapeSection,
+      position = 42)
+  default boolean alwaysShowEscape() {
+    return false;
+  }
+
+  @ConfigItem(
+      keyName = "showEscapeArrow",
+      name = "Show minimap arrow",
+      description = "Arrow pointing to nearest safe zone on minimap",
+      section = escapeSection,
+      position = 43)
+  default boolean showEscapeArrow() {
+    return true;
+  }
+
   // -- Notifications --
 
   @ConfigItem(
@@ -243,7 +281,7 @@ public interface WildernessSentinelConfig extends Config {
       name = "Player spotted notification",
       description = "Notification when a threat is detected",
       section = notificationsSection,
-      position = 41)
+      position = 51)
   default Notification customizableNotification() {
     return new Notification();
   }
@@ -256,7 +294,7 @@ public interface WildernessSentinelConfig extends Config {
       name = "Flash colour",
       description = "Colour and transparency of the alarm flash",
       section = flashSection,
-      position = 51)
+      position = 61)
   default Color flashColor() {
     return new Color(255, 255, 0, 70);
   }
@@ -266,7 +304,7 @@ public interface WildernessSentinelConfig extends Config {
       name = "Flash speed",
       description = "How fast the screen flashes",
       section = flashSection,
-      position = 52)
+      position = 62)
   default FlashSpeed flashControl() {
     return FlashSpeed.NORMAL;
   }
@@ -276,7 +314,7 @@ public interface WildernessSentinelConfig extends Config {
       name = "Flash render layer",
       description = "Rendering layer for the flash overlay",
       section = flashSection,
-      position = 53)
+      position = 63)
   default FlashLayer flashLayer() {
     return FlashLayer.ABOVE_SCENE;
   }
